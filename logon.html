@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>MiniOA</title>
+    <link rel="stylesheet" href="resources/stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="resources/stylesheets/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="resources/stylesheets/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h4 class="center">MiniOA Logon</h4>
+        <div class="form-horizontal">
+            <div class="form-group"><label for="staffId" class="col-sm-2 control-label">STAFF ID</label>
+                <div class="col-sm-10"><input id="staffId" placeholder="staffId" class="form-control" type="text"></div>
+            </div>
+            <div class="form-group"><label for="password" class="col-sm-2 control-label">PASSWORD</label>
+                <div class="col-sm-10"><input id="password" placeholder="password" class="form-control" type="password"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label"></label>
+                <div class="col-sm-10 has-error">
+                    <div id="inputError" class="control-label">STAFF OR PASSWORD ERROR</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <button id="logon" class="btn btn-info btn-block">登 录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="resources/javascripts/jquery.min.js"></script>
+    <script src="resources/javascripts/bootstrap.min.js"></script>
+    <script src="resources/javascripts/md5.min.js"></script>
+    <script>
+        $("#logon").click(function () {
+            $.ajax({
+                type: 'POST',
+                url: 'http://ai-gogo.s1.natapp.cc/user/authorize',
+                data: {
+                    "staffId": $('#password').val(),
+                    "password": md5($('#staffId').val()).toUpperCase()
+                },
+                success: function () {
+                    $('#inputError').hide();
+                    window.location.href = 'http://www.baidu.com'
+                },
+                error: function () {
+                    $('#inputError').show()
+                }
+            });
+        })
+    </script>
+</body>
+
+</html>

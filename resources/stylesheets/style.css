@@ -1,0 +1,31 @@
+body {
+  padding-top: 10px ;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.center{
+  text-align: center
+}
+
+.form-horizontal{
+  margin-top: 50px;
+}
+.vote-top{
+  margin-top: 20px;
+}
+#inputError{
+  display: none;
+  text-align: left;
+}
+.radio,
+.checkbox{
+  height: 56px;
+}
+
+.fail{
+  color: red
+}

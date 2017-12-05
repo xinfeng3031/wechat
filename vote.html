@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>MiniOA</title>
+    <link rel="stylesheet" href="resources/stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="resources/stylesheets/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="resources/stylesheets/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h3 class="center">员工投票</h3>
+        <div class="form-horizontal vote-top">
+            <div id="vote-content">
+            </div>
+            <div class="form-group vote-top">
+                <div class="col-sm-12">
+                    <button id="submit" class="btn btn-info btn-block">投票</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade bs-example-modal-sm" id="success" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">投票结果</h4>
+                </div>
+                <div class="modal-body">
+                    <p class="center">投票成功！</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="close-window">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade bs-example-modal-sm" id="fail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">投票结果</h4>
+                </div>
+                <div class="modal-body">
+                    <p class="center fail">投票失败！</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">返回</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="resources/javascripts/jquery.min.js"></script>
+    <script src="resources/javascripts/bootstrap.min.js"></script>
+    <script src="resources/javascripts/md5.min.js"></script>
+    <script>
+        var config = {
+            Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcGVuSWQiOiJlYjg4MjIxNy00ODZiLTQyNWMtODI4OS04ZDRlMGMyZDM4MmEiLCJzdGFmZklkIjoidGVzdHVzZXIiLCJpYXQiOjE1MDk0NjA1NzF9.IbLs4IqdIQfoMNo_MIlW8ZI3kT-mx-jrJtVuUdIIpIk",
+            openId: "",
+            voteId: "59f983f2c2e60c0d0892298b"
+        }
+        var type,
+            id = $('#vote-content');
+        $.ajax({
+            type: 'GET',
+            headers: {
+                Authorization: config.Authorization
+            },
+            url: 'http://ai-gogo.s1.natapp.cc/votes/'+ config.voteId + '?populate=items.voters',
+            success: function (data) {
+                console.log(data);
+                type = data.type;
+                var html = '';
+                if (type === 0) {
+                    $.each(data.items, function (i, v) {
+                        html += '<div class="radio"><label><input type="radio" value=' + v._id + ' name=optionsRadios>' + v.description + '</label></div>'
+                    })
+                } else {
+                    $.each(data.items, function (i, v) {
+                        html += '<div class="checkbox"><label><input type="checkbox" value=' + v._id + ' name=optionsCheckss>' + v.description + '</label></div>'
+                    })
+                }
+                id.html(html);
+            },
+            error: function (error) {
+                console.log(error)
+            }
+        });
+
+
+        $("#submit").click(function () {
+            var items;
+            if (type === 0) {
+                items = $('input[type=radio]:checked').val();
+            } else {
+                items = [];
+                $('input[type=checkbox]').each(function () {
+                    if ($(this).is(':checked')) {
+                        items.push($(this).val())
+                    }
+                })
+            }
+            console.log(items)
+            if (items != undefined) {
+                $.ajax({
+                    type: 'PUT',
+                    headers: {
+                        Authorization: config.Authorization
+                    },
+                    url: 'http://ai-gogo.s1.natapp.cc/votes/' + config.voteId ,
+                    data: {
+                        actionId: "VOTE",
+                        items: items
+                    },
+                    success: function (data) {
+                        $('#success').modal('show');
+                        $('#success').modal({ backdrop: 'static', keyboard: false });
+                        console.log(data)
+                    },
+                    error: function () {
+                        $('#fail').modal({ backdrop: 'static', keyboard: false });
+                        $('#fail').modal('show')
+                    }
+                });
+            } else {
+                $('#fail').modal({ backdrop: 'static', keyboard: false });
+                $('#fail').modal('show')
+            }
+
+            $('#close-window').on('click',function(){
+                $('#success').modal('hide');
+                window.close()
+            })
+        })
+    </script>
+</body>
+
+</html>
